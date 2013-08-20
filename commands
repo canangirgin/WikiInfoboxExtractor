@@ -1,0 +1,2 @@
+Test-->   --model-file nouncrf  stest
+Train--> --train true --model-file nouncrf  sample
