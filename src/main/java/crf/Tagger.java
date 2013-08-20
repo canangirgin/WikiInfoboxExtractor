@@ -12,8 +12,8 @@ import cc.mallet.types.Alphabet;
 import cc.mallet.types.FeatureVector;
 import cc.mallet.types.InstanceList;
 import cc.mallet.types.Sequence;
-import cc.mallet.util.CommandOption;
 import cc.mallet.util.MalletLogger;
+import crf.features.Options;
 import crf.features.SimpleTaggerSentence2FeatureVectorSequence;
 
 import java.io.*;
@@ -46,131 +46,8 @@ public class Tagger
   {
   }
 
-  /**
-   * Converts an external encoding of a sequence of elements with binary
-   * crf.features to a {@link cc.mallet.types.FeatureVectorSequence}.  If target processing
-   * is on (training or labeled test data), it extracts element labels
-   * from the external encoding to create a target {@link cc.mallet.types.LabelSequence}.
-   * Two external encodings are supported:
-   * <ol>
-   *  <li> A {@link String} containing lines of whitespace-separated tokens.</li>
-   *  <li> a {@link String}<code>[][]</code>.</li>
-   * </ol>
-   *
-   * Both represent rows of tokens. When target processing is on, the last token
-   * in each row is the label of the sequence element represented by
-   * this row. All other tokens in the row, or all tokens in the row if
-   * not target processing, are the names of crf.features that are on for
-   * the sequence element described by the row.
-   *           
-   */
 
-  private static final CommandOption.Double gaussianVarianceOption = new CommandOption.Double
-    (cc.mallet.fst.SimpleTagger.class, "gaussian-variance", "DECIMAL", true, 10.0,
-     "The gaussian prior variance used for training.", null);
 
-  private static final CommandOption.Boolean trainOption = new CommandOption.Boolean
-    (cc.mallet.fst.SimpleTagger.class, "train", "true|false", true, false,
-     "Whether to train", null);
-
-  private static final CommandOption.String testOption = new CommandOption.String
-    (cc.mallet.fst.SimpleTagger.class, "test", "lab or seg=start-1.continue-1,...,start-n.continue-n",
-     true, null,
-     "Test measuring labeling or segmentation (start-i, continue-i) accuracy", null);
-
-  private static final CommandOption.File modelOption = new CommandOption.File
-    (cc.mallet.fst.SimpleTagger.class, "model-file", "FILENAME", true, null,
-     "The filename for reading (train/run) or saving (train) the model.", null);
-
-  private static final CommandOption.Double trainingFractionOption = new CommandOption.Double
-    (cc.mallet.fst.SimpleTagger.class, "training-proportion", "DECIMAL", true, 0.5,
-     "Fraction of data to use for training in a random split.", null);
-
-  private static final CommandOption.Integer randomSeedOption = new CommandOption.Integer
-    (cc.mallet.fst.SimpleTagger.class, "random-seed", "INTEGER", true, 0,
-     "The random seed for randomly selecting a proportion of the instance list for training", null);
-
-  private static final CommandOption.IntegerArray ordersOption = new CommandOption.IntegerArray
-    (cc.mallet.fst.SimpleTagger.class, "orders", "COMMA-SEP-DECIMALS", true, new int[]{1},
-     "List of label Markov orders (main and backoff) ", null);
-
-  private static final CommandOption.String forbiddenOption = new CommandOption.String(
-      cc.mallet.fst.SimpleTagger.class, "forbidden", "REGEXP", true,
-      "\\s", "label1,label2 transition forbidden if it matches this", null);
-
-  private static final CommandOption.String allowedOption = new CommandOption.String(
-      cc.mallet.fst.SimpleTagger.class, "allowed", "REGEXP", true,
-      ".*", "label1,label2 transition allowed only if it matches this", null);
-
-  private static final CommandOption.String defaultOption = new CommandOption.String(
-      cc.mallet.fst.SimpleTagger.class, "default-label", "STRING", true, "O",
-      "Label for initial context and uninteresting tokens", null);
-
-  private static final CommandOption.Integer iterationsOption = new CommandOption.Integer(
-      cc.mallet.fst.SimpleTagger.class, "iterations", "INTEGER", true, 500,
-      "Number of training iterations", null);
-
-  private static final CommandOption.Boolean viterbiOutputOption = new CommandOption.Boolean(
-      cc.mallet.fst.SimpleTagger.class, "viterbi-output", "true|false", true, false,
-      "Print Viterbi periodically during training", null);
-
-  private static final CommandOption.Boolean connectedOption = new CommandOption.Boolean(
-      cc.mallet.fst.SimpleTagger.class, "fully-connected", "true|false", true, true,
-      "Include all allowed transitions, even those not in training data", null);
-  
-  private static final CommandOption.String weightsOption = new CommandOption.String(
-      cc.mallet.fst.SimpleTagger.class, "weights", "sparse|some-dense|dense", true, "some-dense",
-      "Use sparse, some dense (using a heuristic), or dense crf.features on transitions.", null);
-
-  private static final CommandOption.Boolean continueTrainingOption = new CommandOption.Boolean(
-      cc.mallet.fst.SimpleTagger.class, "continue-training", "true|false", false, false,
-      "Continue training from model specified by --model-file", null);
-
-  private static final CommandOption.Integer nBestOption = new CommandOption.Integer(
-      cc.mallet.fst.SimpleTagger.class, "n-best", "INTEGER", true, 1,
-      "How many answers to output", null);
-
-  private static final CommandOption.Integer cacheSizeOption = new CommandOption.Integer(
-      cc.mallet.fst.SimpleTagger.class, "cache-size", "INTEGER", true, 100000,
-      "How much state information to memoize in n-best decoding", null);
-
-  private static final CommandOption.Boolean includeInputOption = new CommandOption.Boolean(
-          cc.mallet.fst.SimpleTagger.class, "include-input", "true|false", true, false,
-     "Whether to include the input crf.features when printing decoding output", null);
-
-  public static final CommandOption.Boolean featureInductionOption = new CommandOption.Boolean(
-          cc.mallet.fst.SimpleTagger.class, "feature-induction", "true|false", true, false,
-     "Whether to perform feature induction during training", null);
-  
-  private static final CommandOption.Integer numThreads = new CommandOption.Integer(
-      cc.mallet.fst.SimpleTagger.class, "threads", "INTEGER", true, 1,
-      "Number of threads to use for crf training.", null);
-
-  private static final CommandOption.List commandOptions =
-    new CommandOption.List (
-        "Training, testing and running a generic tagger.",
-        new CommandOption[] {
-          gaussianVarianceOption,
-          trainOption,
-          iterationsOption,
-          testOption,
-          trainingFractionOption,
-          modelOption,
-          randomSeedOption,
-          ordersOption,
-          forbiddenOption,
-          allowedOption,
-          defaultOption,
-          viterbiOutputOption,
-          connectedOption,
-          weightsOption,
-          continueTrainingOption,
-          nBestOption,
-          cacheSizeOption,
-          includeInputOption,
-          featureInductionOption,
-          numThreads
-        });
 
   /**
    * Create and train a crf model from the given training data,
@@ -214,28 +91,28 @@ public class Tagger
     if (testing != null)
       logger.info("Testing on " + testing.size() + " instances");
     
-  	assert(numThreads.value > 0);
-    if (numThreads.value > 1) {
-      CRFTrainerByThreadedLabelLikelihood crft = new CRFTrainerByThreadedLabelLikelihood(crf,numThreads.value);
+  	assert(Options.numThreads.value > 0);
+    if (Options.numThreads.value > 1) {
+      CRFTrainerByThreadedLabelLikelihood crft = new CRFTrainerByThreadedLabelLikelihood(crf,Options.numThreads.value);
       crft.setGaussianPriorVariance(var);
       
-      if (weightsOption.value.equals("dense")) {
+      if (Options.weightsOption.value.equals("dense")) {
         crft.setUseSparseWeights(false);
         crft.setUseSomeUnsupportedTrick(false);
       }
-      else if (weightsOption.value.equals("some-dense")) {
+      else if (Options.weightsOption.value.equals("some-dense")) {
         crft.setUseSparseWeights(true);
         crft.setUseSomeUnsupportedTrick(true);
       }
-      else if (weightsOption.value.equals("sparse")) {
+      else if (Options.weightsOption.value.equals("sparse")) {
         crft.setUseSparseWeights(true);
         crft.setUseSomeUnsupportedTrick(false);
       }
       else {
-        throw new RuntimeException("Unknown weights option: " + weightsOption.value);
+        throw new RuntimeException("Unknown weights option: " + Options.weightsOption.value);
       }
       
-      if (featureInductionOption.value) {
+      if (Options.featureInductionOption.value) {
       	throw new IllegalArgumentException("Multi-threaded feature induction is not yet supported.");
       } else {
       	boolean converged;
@@ -243,7 +120,7 @@ public class Tagger
       		converged = crft.train (training, 1);
       		if (i % 1 == 0 && eval != null) // Change the 1 to higher integer to evaluate less often
       			eval.evaluate(crft);
-      		if (viterbiOutputOption.value && i % 10 == 0)
+      		if (Options.viterbiOutputOption.value && i % 10 == 0)
       			new ViterbiWriter("", new InstanceList[] {training, testing}, new String[] {"training", "testing"}).evaluate(crft);
       		if (converged)
       			break;
@@ -255,23 +132,23 @@ public class Tagger
       CRFTrainerByLabelLikelihood crft = new CRFTrainerByLabelLikelihood(crf);
       crft.setGaussianPriorVariance(var);
       
-      if (weightsOption.value.equals("dense")) {
+      if (Options.weightsOption.value.equals("dense")) {
         crft.setUseSparseWeights(false);
         crft.setUseSomeUnsupportedTrick(false);
       }
-      else if (weightsOption.value.equals("some-dense")) {
+      else if (Options.weightsOption.value.equals("some-dense")) {
         crft.setUseSparseWeights(true);
         crft.setUseSomeUnsupportedTrick(true);
       }
-      else if (weightsOption.value.equals("sparse")) {
+      else if (Options.weightsOption.value.equals("sparse")) {
         crft.setUseSparseWeights(true);
         crft.setUseSomeUnsupportedTrick(false);
       }
       else {
-        throw new RuntimeException("Unknown weights option: " + weightsOption.value);
+        throw new RuntimeException("Unknown weights option: " + Options.weightsOption.value);
       }
       
-      if (featureInductionOption.value) {
+      if (Options.featureInductionOption.value) {
       	 crft.trainWithFeatureInduction(training, null, testing, eval, iterations, 10, 20, 500, 0.5, false, null);
       } else {
       	boolean converged;
@@ -279,7 +156,7 @@ public class Tagger
       		converged = crft.train (training, 1);
       		if (i % 1 == 0 && eval != null) // Change the 1 to higher integer to evaluate less often
       			eval.evaluate(crft);
-      		if (viterbiOutputOption.value && i % 10 == 0)
+      		if (Options.viterbiOutputOption.value && i % 10 == 0)
       			new ViterbiWriter("", new InstanceList[] {training, testing}, new String[] {"training", "testing"}).evaluate(crft);
       		if (converged)
       			break;
@@ -324,7 +201,7 @@ public class Tagger
     }
     else {
       MaxLatticeDefault lattice =
-              new MaxLatticeDefault(model, input, null, cacheSizeOption.value());
+              new MaxLatticeDefault(model, input, null, Options.cacheSizeOption.value());
 
       answers = lattice.bestOutputSequences(k).toArray(new Sequence[0]);
     }
@@ -391,16 +268,16 @@ public class Tagger
     InstanceList trainingData = null, testData = null;
     int numEvaluations = 0;
     int iterationsBetweenEvals = 16;
-    int restArgs = commandOptions.processOptions(args);
+    int restArgs = Options.commandOptions.processOptions(args);
     if (restArgs == args.length)
     {
-      commandOptions.printUsage(true);
+        Options.commandOptions.printUsage(true);
       throw new IllegalArgumentException("Missing data file(s)");
     }
-    if (trainOption.value)
+    if (Options.trainOption.value)
     {
       trainingFile = new FileReader(new File(args[restArgs]));
-      if (testOption.value != null && restArgs < args.length - 1)
+      if (Options.testOption.value != null && restArgs < args.length - 1)
         testFile = new FileReader(new File(args[restArgs+1]));
     } else 
       testFile = new FileReader(new File(args[restArgs]));
@@ -408,25 +285,25 @@ public class Tagger
     Pipe p = null;
     CRF crf = null;
     TransducerEvaluator eval = null;
-    if (continueTrainingOption.value || !trainOption.value) {
-      if (modelOption.value == null)
+    if (Options.continueTrainingOption.value || !Options.trainOption.value) {
+      if (Options.modelOption.value == null)
       {
-        commandOptions.printUsage(true);
+          Options.commandOptions.printUsage(true);
         throw new IllegalArgumentException("Missing model file option");
       }
       ObjectInputStream s =
-        new ObjectInputStream(new FileInputStream(modelOption.value));
+        new ObjectInputStream(new FileInputStream(Options.modelOption.value));
       crf = (CRF) s.readObject();
       s.close();
       p = crf.getInputPipe();
     }
     else {
       p = new SimpleTaggerSentence2FeatureVectorSequence();
-      p.getTargetAlphabet().lookupIndex(defaultOption.value);
+      p.getTargetAlphabet().lookupIndex(Options.defaultOption.value);
     }
 
 
-    if (trainOption.value)
+    if (Options.trainOption.value)
     {
       p.setTargetProcessing(true);
       trainingData = new InstanceList(p);
@@ -435,7 +312,7 @@ public class Tagger
             Pattern.compile("^\\s*$"), true));
       logger.info
         ("Number of crf.features in training data: "+p.getDataAlphabet().size());
-      if (testOption.value != null)
+      if (Options.testOption.value != null)
       {
         if (testFile != null)
         {
@@ -445,16 +322,16 @@ public class Tagger
                 Pattern.compile("^\\s*$"), true));
         } else
         {
-          Random r = new Random (randomSeedOption.value);
+          Random r = new Random (Options.randomSeedOption.value);
           InstanceList[] trainingLists =
             trainingData.split(
-                r, new double[] {trainingFractionOption.value,
-                  1-trainingFractionOption.value});
+                r, new double[] {Options.trainingFractionOption.value,
+                  1-Options.trainingFractionOption.value});
           trainingData = trainingLists[0];
           testData = trainingLists[1];
         }
       }
-    } else if (testOption.value != null)
+    } else if (Options.testOption.value != null)
     {
       p.setTargetProcessing(true);
       testData = new InstanceList(p);
@@ -472,18 +349,18 @@ public class Tagger
     logger.info ("Number of predicates: "+p.getDataAlphabet().size());
     
     
-    if (testOption.value != null)
+    if (Options.testOption.value != null)
     {
-      if (testOption.value.startsWith("lab"))
+      if (Options.testOption.value.startsWith("lab"))
         eval = new TokenAccuracyEvaluator(new InstanceList[] {trainingData, testData}, new String[] {"Training", "Testing"});
-      else if (testOption.value.startsWith("seg="))
+      else if (Options.testOption.value.startsWith("seg="))
       {
-        String[] pairs = testOption.value.substring(4).split(",");
+        String[] pairs = Options.testOption.value.substring(4).split(",");
         if (pairs.length < 1)
         {
-          commandOptions.printUsage(true);
+            Options.commandOptions.printUsage(true);
           throw new IllegalArgumentException(
-              "Missing segment start/continue labels: " + testOption.value);
+              "Missing segment start/continue labels: " + Options.testOption.value);
         }
         String startTags[] = new String[pairs.length];
         String continueTags[] = new String[pairs.length];
@@ -492,7 +369,7 @@ public class Tagger
           String[] pair = pairs[i].split("\\.");
           if (pair.length != 2)
           {
-            commandOptions.printUsage(true);
+              Options.commandOptions.printUsage(true);
             throw new
               IllegalArgumentException(
                   "Incorrectly-specified segment start and end labels: " +
@@ -506,9 +383,9 @@ public class Tagger
       }
       else
       {
-        commandOptions.printUsage(true);
+          Options.commandOptions.printUsage(true);
         throw new IllegalArgumentException("Invalid test option: " +
-            testOption.value);
+                Options.testOption.value);
       }
     }
     
@@ -522,17 +399,17 @@ public class Tagger
         buf.append(" ").append(targets.lookupObject(i).toString());
       logger.info(buf.toString());
     }
-    if (trainOption.value)
+    if (Options.trainOption.value)
     {
       crf = train(trainingData, testData, eval,
-          ordersOption.value, defaultOption.value,
-          forbiddenOption.value, allowedOption.value,
-          connectedOption.value, iterationsOption.value,
-          gaussianVarianceOption.value, crf);
-      if (modelOption.value != null)
+              Options.ordersOption.value, Options.defaultOption.value,
+              Options.forbiddenOption.value, Options.allowedOption.value,
+              Options.connectedOption.value, Options.iterationsOption.value,
+              Options.gaussianVarianceOption.value, crf);
+      if (Options.modelOption.value != null)
       {
         ObjectOutputStream s =
-          new ObjectOutputStream(new FileOutputStream(modelOption.value));
+          new ObjectOutputStream(new FileOutputStream(Options.modelOption.value));
         s.writeObject(crf);
         s.close();
       }
@@ -541,13 +418,13 @@ public class Tagger
     {
       if (crf == null)
       {
-        if (modelOption.value == null)
+        if (Options.modelOption.value == null)
         {
-          commandOptions.printUsage(true);
+            Options.commandOptions.printUsage(true);
           throw new IllegalArgumentException("Missing model file option");
         }
         ObjectInputStream s =
-          new ObjectInputStream(new FileInputStream(modelOption.value));
+          new ObjectInputStream(new FileInputStream(Options.modelOption.value));
         crf = (CRF) s.readObject();
         s.close();
       }
@@ -555,11 +432,11 @@ public class Tagger
         test(new NoopTransducerTrainer(crf), eval, testData);
       else
       {
-        boolean includeInput = includeInputOption.value();
+        boolean includeInput = Options.includeInputOption.value();
         for (int i = 0; i < testData.size(); i++)
         {
           Sequence input = (Sequence)testData.get(i).getData();
-          Sequence[] outputs = apply(crf, input, nBestOption.value);
+          Sequence[] outputs = apply(crf, input, Options.nBestOption.value);
           int k = outputs.length;
           boolean error = false;
           for (int a = 0; a < k; a++) {

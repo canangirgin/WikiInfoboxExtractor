@@ -2,7 +2,6 @@ package crf.features;
 
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.*;
-import crf.Tagger;
 
 import java.util.ArrayList;
 
@@ -12,6 +11,24 @@ import java.util.ArrayList;
  * Date: 8/20/13
  * Time: 4:00 PM
  * To change this template use File | Settings | File Templates.
+ */
+/**
+ * Converts an external encoding of a sequence of elements with binary
+ * crf.features to a {@link cc.mallet.types.FeatureVectorSequence}.  If target processing
+ * is on (training or labeled test data), it extracts element labels
+ * from the external encoding to create a target {@link cc.mallet.types.LabelSequence}.
+ * Two external encodings are supported:
+ * <ol>
+ *  <li> A {@link String} containing lines of whitespace-separated tokens.</li>
+ *  <li> a {@link String}<code>[][]</code>.</li>
+ * </ol>
+ *
+ * Both represent rows of tokens. When target processing is on, the last token
+ * in each row is the label of the sequence element represented by
+ * this row. All other tokens in the row, or all tokens in the row if
+ * not target processing, are the names of crf.features that are on for
+ * the sequence element described by the row.
+ *
  */
 public class SimpleTaggerSentence2FeatureVectorSequence extends Pipe
 {
@@ -89,7 +106,7 @@ public class SimpleTaggerSentence2FeatureVectorSequence extends Pipe
             for (int index = 0; index < featureIndices.size(); index++) {
                 featureIndicesArr[index] = featureIndices.get(index);
             }
-            fvs[l] = Tagger.featureInductionOption.value ? new AugmentableFeatureVector(features, featureIndicesArr, null, featureIndicesArr.length) :
+            fvs[l] = Options.featureInductionOption.value ? new AugmentableFeatureVector(features, featureIndicesArr, null, featureIndicesArr.length) :
                     new FeatureVector(features, featureIndicesArr);
         }
         carrier.setData(new FeatureVectorSequence(fvs));
