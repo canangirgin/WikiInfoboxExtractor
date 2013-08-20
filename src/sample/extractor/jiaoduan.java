@@ -113,7 +113,7 @@ public class TrainCRF {
 
         //		http://wikilink.googlecode.com/svn/trunk/WikiLink/mallet-2.0-RC2/src/cc/mallet/fst/tests/TestCRF.java
 
-        // CRF trainer
+        // crf trainer
         InstanceList[] lists = trainingInstances.split(new double[]{.2,.5, .8});
         // by default, use L-BFGS as the optimizer
 
@@ -144,7 +144,7 @@ public class TrainCRF {
         //zuofeng's code
         //save crf model
         //refer: /cc/mallet.fst.tests/TestCRF.java
-        // Create a file to store the CRF
+        // Create a file to store the crf
         File f = new File("model.crf");
         //trainer.setUseSparseWeights(false);
 
@@ -178,7 +178,7 @@ public class TrainCRF {
         ThreadedOptimizable optLabel = new ThreadedOptimizable(
                 batchOptLabel, trainingInstances, crf.getParameters().getNumFactors(),
                 new CRFCacheStaleIndicator(crf));
-        // CRF trainer
+        // crf trainer
         ByGradientValue[] opts =
                 new ByGradientValue[]{optLabel};
         // by default, use L-BFGS as the optimizer
@@ -194,7 +194,7 @@ public class TrainCRF {
         //zuofeng's code
         //save crf model
         //refer: /cc/mallet.fst.tests/TestCRF.java
-        // Create a file to store the CRF
+        // Create a file to store the crf
         File f = new File("model.crf");
         //trainer.setUseSparseWeights(false);
 
@@ -221,7 +221,7 @@ public class TrainCRF {
         //zuofeng's code
         //save crf model
         //refer: /cc/mallet.fst.tests/TestCRF.java
-        // Create a file to store the CRF
+        // Create a file to store the crf
         File f = new File("model.crf");
         //trainer.setUseSparseWeights(false);
 
@@ -245,7 +245,7 @@ public class TrainCRF {
         trainer.train(trainingInstances);
 
         //		parameters
-        System.out.println("\nCRF parameters.\n\thyperbolicPriorSlope: "
+        System.out.println("\ncrf parameters.\n\thyperbolicPriorSlope: "
                 + trainer.getUseHyperbolicPriorSlope()
                 + "\n\thyperbolicPriorSharpness: "
                 + trainer.getUseHyperbolicPriorSharpness()

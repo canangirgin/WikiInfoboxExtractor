@@ -64,9 +64,9 @@ class NamedEntityTaggerUtils {
     options.addOption("test", true, "Location of the test file");
     options.addOption("evaluate", false, "Used with 'test'. Performs precision recall calculation. Optional.");
     options.addOption("model", true, "Location of the model file. Required.");
-    options.addOption("iterations", true, "Maximum number of iterations to train CRF. Default INT_MAX");
+    options.addOption("iterations", true, "Maximum number of iterations to train crf. Default INT_MAX");
     options.addOption("threads", true, "Number of threads to use for parallel training. Default 1");
-    options.addOption("orders", true, "Order of the CRF. Default 0,1");
+    options.addOption("orders", true, "Order of the crf. Default 0,1");
     options.addOption("help", false, "Display this help");
     options.addOption("dumpFeatures", true, "Dump a copy of the features to the specified file. Optional.");
     options.addOption("trainRatio", true, 

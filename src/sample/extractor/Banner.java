@@ -170,7 +170,7 @@ public class CRFTagger implements Tagger
      * @param sentences
      *        The {@link Sentence}s to train the tagger on
      * @param order
-     *        The CRF order to use
+     *        The crf order to use
      * @param useFeatureInduction
      *        Whether or not to use feature induction
      * @param format
@@ -324,7 +324,7 @@ public class CRFTagger implements Tagger
 
 
     /**
-     * @return The CRF order used by this tagger. Order 1 means that the last state is used and order 2 means that the last 2 states are used.
+     * @return The crf order used by this tagger. Order 1 means that the last state is used and order 2 means that the last 2 states are used.
      */
     public int getOrder()
     {

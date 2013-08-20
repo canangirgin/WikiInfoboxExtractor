@@ -46,7 +46,7 @@ public class TUI
 
 	static CommandOption.File crfInputFileOption = new CommandOption.File
 	(TUI.class, "crf-input-file", "FILENAME", true, null,
-	 "The name of the file to write the CRF after training.", null);
+	 "The name of the file to write the crf after training.", null);
 
 	static CommandOption.Integer randomSeedOption = new CommandOption.Integer
 	(TUI.class, "random-seed", "INTEGER", true, 0,

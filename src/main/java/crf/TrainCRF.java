@@ -1,4 +1,4 @@
-package CRF;
+package crf;
 
 import cc.mallet.fst.CRF;
 import cc.mallet.fst.CRFTrainerByLabelLikelihood;
