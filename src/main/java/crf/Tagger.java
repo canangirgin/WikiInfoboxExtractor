@@ -173,7 +173,7 @@ public class Tagger
    * Test a transducer on the given test data, evaluating accuracy
    * with the given evaluator
    *
-   * @param model a <code>Transducer</code>
+   * @param tt a <code>Transducer</code>
    * @param eval accuracy evaluator
    * @param testing test data
    */
